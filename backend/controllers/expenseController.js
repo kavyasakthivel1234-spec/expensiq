@@ -89,9 +89,17 @@ const getExpenses = async (req, res) => {
     // Always filter by the logged-in user first
     const query = { user: req.user._id };
 
-    // Search by title (case-insensitive partial match)
+    // ── Smart Search: matches title, category, AND notes ────────
+    // "Pizza" matches "Pizza Hut" (title) or notes containing "pizza"
+    // "Food" matches the category "Food" directly
+    // This makes search feel instant and intelligent
     if (search) {
-      query.title = { $regex: search, $options: "i" };
+      const searchRegex = { $regex: search, $options: "i" };
+      query.$or = [
+        { title:    searchRegex },
+        { category: searchRegex },
+        { notes:    searchRegex },
+      ];
     }
 
     // Filter by category

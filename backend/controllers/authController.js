@@ -429,18 +429,22 @@ const getMe = async (req, res) => {
 // ============================================================
 const updateProfile = async (req, res) => {
   try {
-    const user = await require("../models/User").findById(req.user._id).select("+password");
+    // req.user._id is set by the protect middleware
+    const user = await User.findById(req.user._id).select("+password");
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     const { fullName, profileImage, currentPassword, newPassword } = req.body;
 
-    if (fullName)      user.fullName      = fullName;
-    if (profileImage)  user.profileImage  = profileImage;
+    if (fullName)     user.fullName     = fullName.trim();
+    if (profileImage) user.profileImage = profileImage;
 
     // Password change — requires current password verification
     if (newPassword) {
       if (!currentPassword) {
-        return res.status(400).json({ success: false, message: "Current password is required to set a new password" });
+        return res.status(400).json({
+          success: false,
+          message: "Current password is required to set a new password",
+        });
       }
       const isMatch = await user.comparePassword(currentPassword);
       if (!isMatch) {
@@ -449,26 +453,26 @@ const updateProfile = async (req, res) => {
       if (newPassword.length < 6) {
         return res.status(400).json({ success: false, message: "New password must be at least 6 characters" });
       }
-      user.password = newPassword; // pre-save hook will hash it
+      user.password = newPassword; // pre-save hook hashes it automatically
     }
 
-    await user.save();
+    const updated = await user.save();
 
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
       user: {
-        id:           user._id,
-        fullName:     user.fullName,
-        email:        user.email,
-        profileImage: user.profileImage,
-        role:         user.role,
-        updatedAt:    user.updatedAt,
+        id:           updated._id,
+        fullName:     updated.fullName,
+        email:        updated.email,
+        profileImage: updated.profileImage,
+        role:         updated.role,
+        updatedAt:    updated.updatedAt,
       },
     });
   } catch (error) {
     console.error("updateProfile:", error.message);
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error updating profile" });
   }
 };
 

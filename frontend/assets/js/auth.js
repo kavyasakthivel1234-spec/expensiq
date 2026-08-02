@@ -42,7 +42,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
   if (res.ok) {
     saveAuth(res.data.token, res.data.user);
     showToast("Welcome back! Redirecting...", "success");
-    setTimeout(() => { window.location.href = "/frontend/dashboard.html"; }, 800);
+    setTimeout(() => goTo("dashboard"), 800);
   } else {
     showToast(res.data.message || "Login failed", "error");
   }
@@ -77,7 +77,7 @@ document.getElementById("register-form").addEventListener("submit", async (e) =>
   if (res.ok) {
     saveAuth(res.data.token, res.data.user);
     showToast("Account created! Redirecting...", "success");
-    setTimeout(() => { window.location.href = "/frontend/dashboard.html"; }, 800);
+    setTimeout(() => goTo("dashboard"), 800);
   } else {
     showToast(res.data.message || "Registration failed", "error");
   }

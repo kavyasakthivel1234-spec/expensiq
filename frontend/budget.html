@@ -5,6 +5,95 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ExpenseIQ – Budget</title>
   <link rel="stylesheet" href="assets/css/style.css"/>
+  <style>
+    /* Budget-specific enhancements */
+    .budget-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      position: relative;
+      transition: box-shadow 0.2s;
+    }
+    .budget-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
+
+    .budget-card.exceeded { border-left: 4px solid var(--danger); }
+    .budget-card.warning  { border-left: 4px solid var(--warning); }
+    .budget-card.ok       { border-left: 4px solid var(--success); }
+
+    .budget-status-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+    }
+    .budget-status-badge.exceeded { background:#f8d7da; color:#721c24; }
+    .budget-status-badge.warning  { background:#fff3cd; color:#856404; }
+    .budget-status-badge.ok       { background:#d4edda; color:#155724; }
+
+    .budget-actions { display:flex; gap:6px; }
+
+    /* Validation styles */
+    .form-control.is-error {
+      border-color: var(--danger) !important;
+      box-shadow: 0 0 0 3px rgba(220,53,69,0.15) !important;
+    }
+    .form-control.is-warning {
+      border-color: var(--warning) !important;
+      box-shadow: 0 0 0 3px rgba(255,193,7,0.15) !important;
+    }
+    .field-error {
+      font-size: 12px;
+      color: var(--danger);
+      margin-top: 4px;
+      display: none;
+    }
+    .field-error.show { display: block; }
+    .field-warning {
+      font-size: 12px;
+      color: #856404;
+      margin-top: 4px;
+      display: none;
+      background: #fff3cd;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border-left: 3px solid var(--warning);
+    }
+    .field-warning.show { display: block; }
+
+    /* Salary info row */
+    .salary-info {
+      background: var(--body-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Monthly overview */
+    .month-overview {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .month-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--body-bg);
+      border-radius: 10px;
+      padding: 12px 20px;
+      min-width: 100px;
+      border: 1px solid var(--border);
+    }
+    .month-stat .ms-value { font-size: 18px; font-weight: 700; }
+    .month-stat .ms-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  </style>
 </head>
 <body>
 <div class="layout">
@@ -30,53 +119,80 @@
       <span class="topbar-title">Budget Manager</span>
       <div class="topbar-actions">
         <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
-        <button class="btn btn-primary btn-sm" onclick="openModal('budget-modal')">+ Set Budget</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddBudget()">+ Set Budget</button>
       </div>
     </div>
 
-    <!-- Month selector -->
-    <div class="card mb-3" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-      <label style="font-weight:600">📅 Viewing:</label>
-      <select id="sel-month" class="form-control" style="width:140px" onchange="loadBudgets()">
-        <option value="1">January</option><option value="2">February</option>
-        <option value="3">March</option><option value="4">April</option>
-        <option value="5">May</option><option value="6">June</option>
-        <option value="7">July</option><option value="8">August</option>
-        <option value="9">September</option><option value="10">October</option>
-        <option value="11">November</option><option value="12">December</option>
-      </select>
-      <select id="sel-year" class="form-control" style="width:100px" onchange="loadBudgets()">
-        <option>2024</option><option>2025</option><option>2026</option><option>2027</option>
-      </select>
+    <!-- Month Selector + Overview -->
+    <div class="card mb-3">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+        <label style="font-weight:600">📅 Viewing:</label>
+        <select id="sel-month" class="form-control" style="width:140px" onchange="loadBudgets()">
+          <option value="1">January</option><option value="2">February</option>
+          <option value="3">March</option><option value="4">April</option>
+          <option value="5">May</option><option value="6">June</option>
+          <option value="7">July</option><option value="8">August</option>
+          <option value="9">September</option><option value="10">October</option>
+          <option value="11">November</option><option value="12">December</option>
+        </select>
+        <select id="sel-year" class="form-control" style="width:100px" onchange="loadBudgets()">
+          <option>2024</option><option>2025</option><option>2026</option><option>2027</option>
+        </select>
+      </div>
+      <!-- Monthly stats row -->
+      <div class="month-overview" id="month-overview">
+        <div class="month-stat"><div class="ms-value text-success" id="ov-income">—</div><div class="ms-label">Monthly Income</div></div>
+        <div class="month-stat"><div class="ms-value text-danger" id="ov-expense">—</div><div class="ms-label">Total Spent</div></div>
+        <div class="month-stat"><div class="ms-value" id="ov-budgeted">—</div><div class="ms-label">Total Budgeted</div></div>
+        <div class="month-stat"><div class="ms-value text-primary" id="ov-remaining">—</div><div class="ms-label">Remaining Budget</div></div>
+        <div class="month-stat"><div class="ms-value" id="ov-count">—</div><div class="ms-label">Budget Categories</div></div>
+      </div>
     </div>
 
-    <!-- Budget Cards -->
+    <!-- Budget Cards Grid -->
     <div id="budget-grid" class="grid-2"></div>
   </main>
 </div>
 
-<!-- Budget Modal -->
+<!-- ── Add / Edit Budget Modal ── -->
 <div class="modal-overlay" id="budget-modal">
-  <div class="modal-box" style="max-width:420px">
+  <div class="modal-box" style="max-width:460px">
     <div class="modal-header">
-      <h3>Set Monthly Budget</h3>
-      <button class="modal-close" onclick="closeModal('budget-modal')">✕</button>
+      <h3 id="budget-modal-title">Set Monthly Budget</h3>
+      <button class="modal-close" onclick="closeBudgetModal()">✕</button>
     </div>
-    <form id="budget-form">
+    <form id="budget-form" novalidate>
       <input type="hidden" id="budget-id"/>
+
+      <!-- Salary reference -->
+      <div class="salary-info" id="salary-info-row">
+        💵 <span>Monthly Income: <strong id="salary-display">—</strong></span>
+        <small class="text-muted">(fetched from your income records)</small>
+      </div>
+
       <div class="form-group">
         <label>Category *</label>
-        <select id="bud-category" class="form-control" required>
+        <select id="bud-category" class="form-control" required onchange="validateBudgetLimit()">
           <option value="">Select category</option>
           <option>Food</option><option>Travel</option><option>Shopping</option>
           <option>Bills</option><option>Health</option><option>Entertainment</option>
           <option>Education</option><option>Others</option><option>Total</option>
         </select>
+        <span class="field-error" id="err-category">Please select a category.</span>
       </div>
+
       <div class="form-group">
         <label>Monthly Limit (₹) *</label>
-        <input type="number" id="bud-limit" class="form-control" placeholder="e.g. 5000" min="1" required/>
+        <input type="number" id="bud-limit" class="form-control" placeholder="e.g. 5000"
+               min="1" required oninput="validateBudgetLimit()"/>
+        <span class="field-error"  id="err-limit">Please enter a valid amount greater than 0.</span>
+        <div class="field-warning" id="warn-salary">
+          ⚠️ <strong>Budget exceeds your monthly income.</strong>
+          Please enter a budget ≤ <span id="warn-salary-amount">your income</span>.
+          Setting a budget higher than your income is not recommended.
+        </div>
       </div>
+
       <div class="form-row">
         <div class="form-group">
           <label>Month</label>
@@ -96,11 +212,30 @@
           </select>
         </div>
       </div>
+
       <div style="display:flex;gap:10px;justify-content:flex-end">
-        <button type="button" class="btn btn-outline" onclick="closeModal('budget-modal')">Cancel</button>
+        <button type="button" class="btn btn-outline" onclick="closeBudgetModal()">Cancel</button>
         <button type="submit" class="btn btn-primary" id="save-btn">Save Budget</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ── Delete Confirm Modal ── -->
+<div class="modal-overlay" id="delete-budget-modal">
+  <div class="modal-box" style="max-width:380px">
+    <div class="modal-header">
+      <h3>Delete Budget</h3>
+      <button class="modal-close" onclick="closeModal('delete-budget-modal')">✕</button>
+    </div>
+    <p style="margin-bottom:8px;color:var(--text-muted)">
+      Are you sure you want to delete the <strong id="del-cat-name">this</strong> budget?
+      This action cannot be undone.
+    </p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button class="btn btn-outline" onclick="closeModal('delete-budget-modal')">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete-budget-btn">Delete Budget</button>
+    </div>
   </div>
 </div>
 

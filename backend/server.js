@@ -57,15 +57,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ── Middleware 3: CORS (Cross-Origin Resource Sharing) ────────
-// By default, browsers BLOCK requests from a different origin
-// Example: Frontend on http://localhost:3000 calling Backend on http://localhost:5000
-// CORS middleware tells the browser: "Yes, this cross-origin request is allowed"
+// Allows the frontend to call this API from any origin during development.
+// In production, restrict `origin` to your actual Vercel domain.
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "*", // Which frontend URLs can call this API
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allowed request headers
-    // "Authorization" header carries the JWT token for protected routes
+    // "null" covers file:// protocol (opening HTML directly in browser)
+    // "*"    covers Live Server and all other origins
+    origin: (origin, callback) => callback(null, true),
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: false,
   })
 );
 
