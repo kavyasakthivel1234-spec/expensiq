@@ -185,10 +185,8 @@ function renderAdvisor(response) {
     schemeGrid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><i>📊</i><p>No recommendations generated. Add expenses first.</p></div>`;
   }
 
-  // Source badge
-  const badge = document.getElementById("scheme-source-badge");
-  badge.textContent = source === "groq" ? "🤖 Groq AI" : "📊 Offline Analysis";
-  badge.style.background = source === "groq" ? "#e8e6ff" : "#e2e3e5";
+
+
 
   // ── Monthly Action Plan ───────────────────────────────────
   const plan = advisor.monthlyPlan;
@@ -232,6 +230,9 @@ function renderAdvisor(response) {
   document.getElementById("initial-state").style.display   = "none";
   document.getElementById("advisor-results").style.display = "block";
 
+  // ── NEW: Recommended Investment Plan section ──────────────
+  renderInvestmentPlan(advisor, context);
+
   showToast(
     source === "groq"
       ? "AI recommendations ready! 🎉"
@@ -245,3 +246,108 @@ function renderAdvisor(response) {
 
 // Load snapshot stats immediately on page open
 loadSnapshot();
+
+// ============================================================
+// renderInvestmentPlan — NEW SECTION
+// Appended below the existing advisor results.
+// Uses the actual monthly savings (income - expenses) to show
+// a clean, professional investment allocation table.
+// Does NOT modify any existing function or variable.
+// ============================================================
+function renderInvestmentPlan(advisor, context) {
+  // ── Compute actual monthly savings ─────────────────────
+  // Use real income/expense from context; fallback to plan values
+  const monthlyIncome  = context?.totalIncome  || advisor.monthlyPlan?.currentSavings || 0;
+  const monthlyExpense = context?.totalExpense || 0;
+  const actualSavings  = Math.max(0, monthlyIncome - monthlyExpense);
+
+  // The schemes come from the already-rendered advisor.recommendations
+  // We reuse them — no extra API call needed
+  const schemes = advisor.recommendations || [];
+
+  // ── Update savings pill ───────────────────────────────
+  const pill = document.getElementById("invest-savings-pill");
+  if (pill) {
+    pill.textContent = `Monthly Savings: ${formatCurrency(actualSavings)}`;
+    pill.style.background = actualSavings > 0 ? "#d4edda" : "#f8d7da";
+    pill.style.color      = actualSavings > 0 ? "#155724" : "#721c24";
+  }
+
+  // ── Update intro line ──────────────────────────────────
+  const intro = document.getElementById("invest-intro");
+  if (intro && monthlyIncome > 0) {
+    intro.innerHTML =
+      `Based on your monthly savings of <strong>${formatCurrency(actualSavings)}</strong> ` +
+      `(Income ${formatCurrency(monthlyIncome)} − Expenses ${formatCurrency(monthlyExpense)}), ` +
+      `you may consider the following investment allocation:`;
+  }
+
+  // ── Build table rows ───────────────────────────────────
+  const tbody = document.getElementById("invest-tbody");
+  const tfoot = document.getElementById("invest-tfoot");
+
+  if (!schemes.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px">No recommendations available. Add income and expenses first.</td></tr>`;
+    tfoot.innerHTML = "";
+    return;
+  }
+
+  // Risk badge helper
+  const riskBadge = (r) => {
+    const cls = (r || "").toLowerCase() === "low" ? "low"
+              : (r || "").toLowerCase() === "high" ? "high" : "medium";
+    return `<span class="invest-risk-badge ${cls}">${r || "Low"}</span>`;
+  };
+
+  // Type → emoji
+  const typeEmoji = (t) => {
+    if (!t) return "📦";
+    const tl = t.toLowerCase();
+    if (tl.includes("government")) return "🏛️";
+    if (tl.includes("invest"))     return "📈";
+    if (tl.includes("bank"))       return "🏦";
+    if (tl.includes("emergency"))  return "🛡️";
+    return "📦";
+  };
+
+  const totalAllocated = schemes.reduce((s, r) => s + (r.recommendedAmount || 0), 0);
+
+  tbody.innerHTML = schemes.map((rec, i) => `
+    <tr>
+      <td style="color:var(--text-muted);font-weight:700">${i + 1}</td>
+      <td>
+        <div style="font-weight:700;font-size:14px">${rec.scheme}</div>
+        ${rec.tenure ? `<div style="font-size:11px;color:var(--text-muted)">Tenure: ${rec.tenure}</div>` : ""}
+      </td>
+      <td>
+        <span class="invest-type-tag">${typeEmoji(rec.type)} ${rec.type || "—"}</span>
+      </td>
+      <td>${riskBadge(rec.riskLevel)}</td>
+      <td class="text-right">
+        <strong style="font-size:15px;color:var(--primary)">${formatCurrency(rec.recommendedAmount || 0)}</strong>
+        <div style="font-size:10px;color:var(--text-muted)">/month</div>
+      </td>
+      <td style="font-size:12px;color:var(--text-muted);max-width:200px;line-height:1.4">${rec.reason || "—"}</td>
+    </tr>`).join("");
+
+  // Footer: total row
+  const unallocated = Math.max(0, actualSavings - totalAllocated);
+  tfoot.innerHTML = `
+    <tr>
+      <td colspan="4" style="text-align:right">Total Recommended Investment</td>
+      <td class="text-right" style="color:var(--primary)">${formatCurrency(totalAllocated)}/month</td>
+      <td></td>
+    </tr>
+    ${unallocated > 0 ? `
+    <tr>
+      <td colspan="4" style="text-align:right;color:var(--text-muted);font-size:12px">Unallocated Savings</td>
+      <td class="text-right" style="color:var(--text-muted);font-size:12px">${formatCurrency(unallocated)}/month</td>
+      <td style="font-size:11px;color:var(--text-muted)">Keep in savings account</td>
+    </tr>` : ""}`;
+
+  // ── Overall Advice box ─────────────────────────────────
+  const adviceEl = document.getElementById("invest-advice");
+  if (adviceEl) {
+    adviceEl.innerHTML = `<strong>📌 Overall Advice</strong><br/>${advisor.summary || "Invest consistently every month. Start small and increase allocations as your income grows. This is an educational recommendation — consult a SEBI-registered advisor before investing."}`;
+  }
+}
