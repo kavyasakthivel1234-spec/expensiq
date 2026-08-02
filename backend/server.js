@@ -103,13 +103,23 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// ── Future Routes (Phase by Phase) ───────────────────────────
-// Phase 3: app.use("/api/auth",     require("./routes/authRoutes"));
-// Phase 5: app.use("/api/expenses", require("./routes/expenseRoutes"));
-// Phase 6: app.use("/api/income",   require("./routes/incomeRoutes"));
-// Phase 7: app.use("/api/dashboard",require("./routes/dashboardRoutes"));
-// Phase 9: app.use("/api/budget",   require("./routes/budgetRoutes"));
-// Phase 10:app.use("/api/ai",       require("./routes/aiRoutes"));
+// ── Authentication Routes ─────────────────────────────────────
+app.use("/api/auth",      require("./routes/authRoutes"));
+
+// ── Expense Routes ────────────────────────────────────────────
+app.use("/api/expenses",  require("./routes/expenseRoutes"));
+
+// ── Income Routes ─────────────────────────────────────────────
+app.use("/api/income",    require("./routes/incomeRoutes"));
+
+// ── Dashboard Routes ──────────────────────────────────────────
+app.use("/api/dashboard", require("./routes/dashboardRoutes"));
+
+// ── Budget Routes ─────────────────────────────────────────────
+app.use("/api/budget",    require("./routes/budgetRoutes"));
+
+// ── AI Routes ────────────────────────────────────────────────
+app.use("/api/ai",        require("./routes/aiRoutes"));
 
 // ============================================================
 // ERROR HANDLERS (Must be AFTER all routes)

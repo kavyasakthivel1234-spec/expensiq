@@ -1,11 +1,109 @@
-<!-- profile.html - User Profile Page (will be built in Phase 11) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ExpenseIQ - Profile</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExpenseIQ – Profile</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
 </head>
 <body>
-  <h1>Profile - Coming in Phase 11</h1>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">💰 Expense<span>IQ</span></div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html">🏠 Dashboard</a>
+      <a href="expenses.html">💸 Expenses</a>
+      <a href="income.html">💵 Income</a>
+      <a href="budget.html">🎯 Budget</a>
+      <a href="ai-insights.html">🤖 AI Insights</a>
+      <a href="profile.html">👤 Profile</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info"><strong id="sidebar-user-name">User</strong><span id="sidebar-user-email"></span></div>
+      <button class="btn btn-outline btn-sm" style="width:100%" onclick="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <button class="btn btn-outline btn-icon" id="sidebar-toggle">☰</button>
+      <span class="topbar-title">My Profile</span>
+      <div class="topbar-actions">
+        <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Profile Info Card -->
+      <div class="card">
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="width:80px;height:80px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff;margin:0 auto 12px">
+            👤
+          </div>
+          <h3 id="profile-name" style="font-size:20px">—</h3>
+          <p id="profile-email" class="text-muted" style="font-size:14px">—</p>
+          <span class="badge badge-salary" id="profile-role" style="margin-top:4px">user</span>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:16px">
+          <div class="flex-between mb-1" style="font-size:14px">
+            <span class="text-muted">Member since</span>
+            <strong id="profile-since">—</strong>
+          </div>
+          <div class="flex-between mb-1" style="font-size:14px">
+            <span class="text-muted">Last updated</span>
+            <strong id="profile-updated">—</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Update Profile Form -->
+      <div class="card">
+        <h4 style="margin-bottom:20px">Update Profile</h4>
+        <form id="profile-form">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="prof-name" class="form-control" placeholder="Your name"/>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="prof-email" class="form-control" disabled style="opacity:0.6;cursor:not-allowed"/>
+            <small class="text-muted">Email cannot be changed</small>
+          </div>
+          <button type="submit" class="btn btn-primary" id="update-btn" style="width:100%">
+            💾 Update Profile
+          </button>
+        </form>
+
+        <hr style="margin:20px 0;border-color:var(--border)"/>
+
+        <h4 style="margin-bottom:16px">Change Password</h4>
+        <form id="password-form">
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" id="curr-pass" class="form-control" placeholder="Enter current password"/>
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="new-pass" class="form-control" placeholder="Min 6 characters"/>
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" id="conf-pass" class="form-control" placeholder="Repeat new password"/>
+          </div>
+          <button type="submit" class="btn btn-outline" id="pass-btn" style="width:100%">
+            🔒 Change Password
+          </button>
+        </form>
+
+        <hr style="margin:20px 0;border-color:var(--border)"/>
+        <button class="btn btn-danger" style="width:100%" onclick="logout()">🚪 Logout</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/profile.js"></script>
 </body>
 </html>

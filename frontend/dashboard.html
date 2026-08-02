@@ -1,11 +1,84 @@
-<!-- dashboard.html - Dashboard Page (will be built in Phase 11) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ExpenseIQ - Dashboard</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExpenseIQ – Dashboard</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h1>Dashboard - Coming in Phase 11</h1>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">💰 Expense<span>IQ</span></div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html">🏠 Dashboard</a>
+      <a href="expenses.html">💸 Expenses</a>
+      <a href="income.html">💵 Income</a>
+      <a href="budget.html">🎯 Budget</a>
+      <a href="ai-insights.html">🤖 AI Insights</a>
+      <a href="profile.html">👤 Profile</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <strong id="sidebar-user-name">User</strong>
+        <span id="sidebar-user-email"></span>
+      </div>
+      <button class="btn btn-outline btn-sm" style="width:100%" onclick="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <button class="btn btn-outline btn-icon" id="sidebar-toggle">☰</button>
+      <span class="topbar-title">Dashboard</span>
+      <div class="topbar-actions">
+        <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid-4 mb-3" id="stat-cards">
+      <div class="stat-card"><div class="stat-icon green">💵</div><div class="stat-body"><div class="stat-label">Total Income</div><div class="stat-value" id="stat-income">—</div></div></div>
+      <div class="stat-card"><div class="stat-icon red">💸</div><div class="stat-body"><div class="stat-label">Total Expense</div><div class="stat-value" id="stat-expense">—</div></div></div>
+      <div class="stat-card"><div class="stat-icon blue">💰</div><div class="stat-body"><div class="stat-label">Balance</div><div class="stat-value" id="stat-balance">—</div></div></div>
+      <div class="stat-card"><div class="stat-icon purple">📊</div><div class="stat-body"><div class="stat-label">This Month</div><div class="stat-value" id="stat-monthly">—</div><div class="stat-sub" id="stat-txn"></div></div></div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid-2 mb-3">
+      <div class="card">
+        <div class="flex-between mb-2"><strong>Expense by Category</strong></div>
+        <div class="chart-container"><canvas id="pie-chart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="flex-between mb-2"><strong>Income vs Expense (6 months)</strong></div>
+        <div class="chart-container"><canvas id="bar-chart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="card">
+      <div class="flex-between mb-2">
+        <strong>Recent Transactions</strong>
+        <a href="expenses.html" style="font-size:13px;color:var(--primary)">View all →</a>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Title</th><th>Category</th><th>Type</th><th>Date</th><th class="text-right">Amount</th></tr></thead>
+          <tbody id="recent-tbody"><tr><td colspan="5"><div class="loading-center"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/dashboard.js"></script>
 </body>
 </html>

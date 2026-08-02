@@ -1,11 +1,77 @@
-<!-- ai-insights.html - AI Insights Page (will be built in Phase 11) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ExpenseIQ - AI Insights</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExpenseIQ – AI Insights</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
 </head>
 <body>
-  <h1>AI Insights - Coming in Phase 11</h1>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">💰 Expense<span>IQ</span></div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html">🏠 Dashboard</a>
+      <a href="expenses.html">💸 Expenses</a>
+      <a href="income.html">💵 Income</a>
+      <a href="budget.html">🎯 Budget</a>
+      <a href="ai-insights.html">🤖 AI Insights</a>
+      <a href="profile.html">👤 Profile</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info"><strong id="sidebar-user-name">User</strong><span id="sidebar-user-email"></span></div>
+      <button class="btn btn-outline btn-sm" style="width:100%" onclick="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <button class="btn btn-outline btn-icon" id="sidebar-toggle">☰</button>
+      <span class="topbar-title">AI Financial Insights</span>
+      <div class="topbar-actions">
+        <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="card mb-3" style="background:linear-gradient(135deg,#6c63ff,#3f3d56);color:#fff;border:none">
+      <h2 style="margin-bottom:8px">🤖 AI-Powered Financial Analysis</h2>
+      <p style="opacity:0.85;font-size:14px">Get personalized spending insights and saving recommendations based on your last 30 days of transactions.</p>
+    </div>
+
+    <!-- Spending summary stats -->
+    <div class="grid-3 mb-3" id="ai-stats">
+      <div class="stat-card"><div class="stat-icon red">💸</div><div class="stat-body"><div class="stat-label">30-Day Expense</div><div class="stat-value" id="ai-expense">—</div></div></div>
+      <div class="stat-card"><div class="stat-icon green">💵</div><div class="stat-body"><div class="stat-label">30-Day Income</div><div class="stat-value" id="ai-income">—</div></div></div>
+      <div class="stat-card"><div class="stat-icon blue">💰</div><div class="stat-body"><div class="stat-label">Balance</div><div class="stat-value" id="ai-balance">—</div></div></div>
+    </div>
+
+    <!-- AI Insights box -->
+    <div class="card mb-3">
+      <div class="flex-between mb-2">
+        <strong>💡 AI Analysis</strong>
+        <button class="btn btn-primary btn-sm" onclick="generateInsights()" id="ai-btn">
+          ✨ Generate Insights
+        </button>
+      </div>
+      <div id="insights-content">
+        <div class="empty-state">
+          <i>🤖</i>
+          <p>Click "Generate Insights" to get your personalized AI financial analysis.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category breakdown -->
+    <div class="card" id="category-card" style="display:none">
+      <strong class="mb-2" style="display:block">📊 Category Breakdown (Last 30 Days)</strong>
+      <div id="category-list"></div>
+    </div>
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/ai.js"></script>
 </body>
 </html>

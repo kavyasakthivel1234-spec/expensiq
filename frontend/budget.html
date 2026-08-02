@@ -1,11 +1,111 @@
-<!-- budget.html - Budget Page (will be built in Phase 11) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ExpenseIQ - Budget</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExpenseIQ – Budget</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
 </head>
 <body>
-  <h1>Budget - Coming in Phase 11</h1>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">💰 Expense<span>IQ</span></div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html">🏠 Dashboard</a>
+      <a href="expenses.html">💸 Expenses</a>
+      <a href="income.html">💵 Income</a>
+      <a href="budget.html">🎯 Budget</a>
+      <a href="ai-insights.html">🤖 AI Insights</a>
+      <a href="profile.html">👤 Profile</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info"><strong id="sidebar-user-name">User</strong><span id="sidebar-user-email"></span></div>
+      <button class="btn btn-outline btn-sm" style="width:100%" onclick="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <button class="btn btn-outline btn-icon" id="sidebar-toggle">☰</button>
+      <span class="topbar-title">Budget Manager</span>
+      <div class="topbar-actions">
+        <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+        <button class="btn btn-primary btn-sm" onclick="openModal('budget-modal')">+ Set Budget</button>
+      </div>
+    </div>
+
+    <!-- Month selector -->
+    <div class="card mb-3" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <label style="font-weight:600">📅 Viewing:</label>
+      <select id="sel-month" class="form-control" style="width:140px" onchange="loadBudgets()">
+        <option value="1">January</option><option value="2">February</option>
+        <option value="3">March</option><option value="4">April</option>
+        <option value="5">May</option><option value="6">June</option>
+        <option value="7">July</option><option value="8">August</option>
+        <option value="9">September</option><option value="10">October</option>
+        <option value="11">November</option><option value="12">December</option>
+      </select>
+      <select id="sel-year" class="form-control" style="width:100px" onchange="loadBudgets()">
+        <option>2024</option><option>2025</option><option>2026</option><option>2027</option>
+      </select>
+    </div>
+
+    <!-- Budget Cards -->
+    <div id="budget-grid" class="grid-2"></div>
+  </main>
+</div>
+
+<!-- Budget Modal -->
+<div class="modal-overlay" id="budget-modal">
+  <div class="modal-box" style="max-width:420px">
+    <div class="modal-header">
+      <h3>Set Monthly Budget</h3>
+      <button class="modal-close" onclick="closeModal('budget-modal')">✕</button>
+    </div>
+    <form id="budget-form">
+      <input type="hidden" id="budget-id"/>
+      <div class="form-group">
+        <label>Category *</label>
+        <select id="bud-category" class="form-control" required>
+          <option value="">Select category</option>
+          <option>Food</option><option>Travel</option><option>Shopping</option>
+          <option>Bills</option><option>Health</option><option>Entertainment</option>
+          <option>Education</option><option>Others</option><option>Total</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Monthly Limit (₹) *</label>
+        <input type="number" id="bud-limit" class="form-control" placeholder="e.g. 5000" min="1" required/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Month</label>
+          <select id="bud-month" class="form-control" required>
+            <option value="1">January</option><option value="2">February</option>
+            <option value="3">March</option><option value="4">April</option>
+            <option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option>
+            <option value="9">September</option><option value="10">October</option>
+            <option value="11">November</option><option value="12">December</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <select id="bud-year" class="form-control" required>
+            <option>2024</option><option>2025</option><option>2026</option><option>2027</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button type="button" class="btn btn-outline" onclick="closeModal('budget-modal')">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="save-btn">Save Budget</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/budget.js"></script>
 </body>
 </html>

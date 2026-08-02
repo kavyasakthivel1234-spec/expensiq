@@ -1,11 +1,75 @@
-<!-- index.html - Login / Register Page (will be built in Phase 11) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>ExpenseIQ - Login</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExpenseIQ – Login</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
 </head>
 <body>
-  <h1>ExpenseIQ - Coming in Phase 11</h1>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <div class="logo">
+      <h2>💰 ExpenseIQ</h2>
+      <p>AI-Powered Personal Expense Tracker</p>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;margin-bottom:24px;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
+      <button id="tab-login"    class="btn" style="flex:1;border-radius:0;background:var(--primary);color:#fff" onclick="switchTab('login')">Login</button>
+      <button id="tab-register" class="btn" style="flex:1;border-radius:0;background:transparent;color:var(--text)" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="login-email" class="form-control" placeholder="you@example.com" required/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" class="form-control" placeholder="Enter password" required/>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%" id="login-btn">
+        Login
+      </button>
+      <p class="mt-2 text-muted" style="text-align:center;font-size:13px">
+        Don't have an account? <a href="#" onclick="switchTab('register')" style="color:var(--primary)">Register here</a>
+      </p>
+    </form>
+
+    <!-- Register Form -->
+    <form id="register-form" style="display:none">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" class="form-control" placeholder="John Doe" required/>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="reg-email" class="form-control" placeholder="you@example.com" required/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" class="form-control" placeholder="Min 6 characters" required/>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%" id="reg-btn">
+        Create Account
+      </button>
+      <p class="mt-2 text-muted" style="text-align:center;font-size:13px">
+        Already have an account? <a href="#" onclick="switchTab('login')" style="color:var(--primary)">Login here</a>
+      </p>
+    </form>
+
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container" class="toast-container"></div>
+
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/auth.js"></script>
 </body>
 </html>
