@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 💰 ExpenseIQ — AI-Powered Personal Expense Tracker
 
 A production-ready full-stack FinTech application that helps users track expenses, manage budgets, and receive personalized AI-driven investment recommendations based on real Indian financial schemes.
@@ -296,3 +297,6 @@ The Groq prompt explicitly instructs the AI to:
 ## 📝 License
 
 MIT — Free to use for educational and portfolio purposes.
+=======
+# expensiq
+>>>>>>> 4d176c20f7e480136915550011b091a604df9a2e
