@@ -1,34 +1,52 @@
 // ============================================================
-// FILE: backend/config/db.js
-// PURPOSE: Establishes and manages the MongoDB Atlas connection
+// FILE   : backend/config/db.js
+// PURPOSE: Connect Node.js application to MongoDB Atlas
 // ============================================================
 
+// mongoose is the ODM (Object Data Modeling) library for MongoDB
+// It lets us define schemas, models, and query the DB using JS objects
 const mongoose = require("mongoose");
 
+// connectDB is an async function because mongoose.connect() returns a Promise
+// We use async/await instead of .then()/.catch() for cleaner, readable code
 const connectDB = async () => {
+
   try {
-    // mongoose.connect() returns a connection object
-    // We store it in `conn` to read the host name for our log
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-      // These options suppress deprecation warnings in newer Mongoose versions
-      // and ensure a stable, predictable connection behavior
-      serverSelectionTimeoutMS: 5000, // Fail fast if Atlas is unreachable (5 sec)
+    // ── mongoose.connect() ──────────────────────────────────
+    // First argument  : The MongoDB Atlas connection string from .env
+    // Second argument : Options object to fine-tune the connection
+
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      // serverSelectionTimeoutMS:
+      // How long (in ms) Mongoose waits to find an available MongoDB server
+      // Default is 30,000ms (30 sec) — we set 5,000ms to fail faster
+      // This gives a quick error instead of hanging for half a minute
+      serverSelectionTimeoutMS: 5000,
     });
 
-    // conn.connection.host tells us WHICH Atlas cluster we connected to
-    // e.g. "cluster0-shard-00-00.abc12.mongodb.net"
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    // conn.connection.host : the actual Atlas cluster address we connected to
+    // Example: "cluster0-shard-00-00.pwrn6rh.mongodb.net"
+    // This confirms WHICH cluster is connected — useful if you have multiple
+    console.log(`✅ MongoDB Connected Successfully`);
+    console.log(`📦 Host: ${conn.connection.host}`);
+    console.log(`🗄️  Database: ${conn.connection.name}`);
 
   } catch (error) {
-    // Log the exact error message so we know what went wrong
-    // Common causes: wrong URI, network issue, IP not whitelisted on Atlas
-    console.error(`❌ MongoDB Connection Failed: ${error.message}`);
+    // ── Error Handling ──────────────────────────────────────
+    // Common causes of failure:
+    // 1. Wrong password in MONGODB_URI
+    // 2. Your IP is not whitelisted in Atlas Network Access
+    // 3. No internet connection
+    // 4. MONGODB_URI variable missing in .env
+    console.error(`❌ MongoDB Connection Failed!`);
+    console.error(`📋 Reason: ${error.message}`);
 
-    // process.exit(1) forces Node.js to shut down with a "failure" code
-    // We do this because the app is useless without a database
+    // process.exit(1) shuts down the Node.js process immediately
+    // "1" means "exited with an error" (0 means success)
+    // We exit because without a database, the app cannot function at all
     process.exit(1);
   }
 };
 
-// Export so server.js can call it at startup
+// Export the function so server.js can import and call it
 module.exports = connectDB;
