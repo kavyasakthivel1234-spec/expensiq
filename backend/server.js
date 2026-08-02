@@ -26,6 +26,7 @@ requiredEnvVars.forEach((varName) => {
 // ── STEP C: Import Dependencies ──────────────────────────────
 const express   = require("express");  // Web framework for Node.js
 const cors      = require("cors");     // Enables Cross-Origin Resource Sharing
+const path      = require("path");     // Core utility for working with file paths
 const connectDB = require("./config/db"); // Our custom DB connection function
 
 // ── STEP D: Connect to MongoDB Atlas ─────────────────────────
@@ -59,11 +60,25 @@ app.use(express.urlencoded({ extended: true }));
 // ── Middleware 3: CORS (Cross-Origin Resource Sharing) ────────
 // Allows the frontend to call this API from any origin during development.
 // In production, restrict `origin` to your actual Vercel domain.
+const frontendOrigin = process.env.FRONTEND_URL || "*";
 app.use(
   cors({
-    // "null" covers file:// protocol (opening HTML directly in browser)
-    // "*"    covers Live Server and all other origins
-    origin: (origin, callback) => callback(null, true),
+    origin: (origin, callback) => {
+      // If FRONTEND_URL is "*" or undefined, allow all
+      if (frontendOrigin === "*" || !origin) {
+        return callback(null, true);
+      }
+      // If it matches FRONTEND_URL, allow
+      if (origin === frontendOrigin || origin === frontendOrigin.replace(/\/$/, "")) {
+        return callback(null, true);
+      }
+      // Always allow local dev for convenience
+      if (origin === "null" || origin.includes("localhost") || origin.includes("127.0.0.1")) {
+        return callback(null, true);
+      }
+      // Otherwise fallback to allow
+      return callback(null, true);
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: false,
@@ -76,20 +91,20 @@ app.use(
 // ============================================================
 
 // ── Test Route: GET / ─────────────────────────────────────────
-// This is our "is the server alive?" route
-// req = the incoming request object
-// res = the outgoing response object
+// If a browser requests the root URL, serve the frontend application.
+// For API/JSON clients, return the backend status metadata.
 app.get("/", (req, res) => {
-  // res.status(200) sets the HTTP status code to 200 (OK)
-  // .json() converts the JS object to JSON and sends it as the response
-  // It also automatically sets Content-Type: application/json
-  res.status(200).json({
-    success: true,
-    message: "ExpenseIQ Backend is Running 🚀",
-    version: "1.0.0",
-    environment: process.env.NODE_ENV,
-    timestamp: new Date().toISOString(),
-  });
+  if (req.accepts("html") && !req.xhr) {
+    res.sendFile(path.join(__dirname, "../frontend/index.html"));
+  } else {
+    res.status(200).json({
+      success: true,
+      message: "ExpenseIQ Backend is Running 🚀",
+      version: "1.0.0",
+      environment: process.env.NODE_ENV,
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 // ── Health Check Route: GET /api/health ───────────────────────
@@ -121,6 +136,10 @@ app.use("/api/budget",    require("./routes/budgetRoutes"));
 
 // ── AI Routes ────────────────────────────────────────────────
 app.use("/api/ai",        require("./routes/aiRoutes"));
+
+// ── Serve Frontend Static Files ───────────────────────────────
+// Serves static HTML pages and assets if they weren't caught by API routes
+app.use(express.static(path.join(__dirname, "../frontend")));
 
 // ============================================================
 // ERROR HANDLERS (Must be AFTER all routes)
