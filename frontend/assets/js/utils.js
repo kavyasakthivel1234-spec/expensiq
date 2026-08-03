@@ -3,16 +3,15 @@
 // PURPOSE: Shared helpers used across every page
 // ============================================================
 
-// Dynamically determine the backend API base URL.
-// If running locally in a browser on a port other than 5000 (e.g. Live Server on 5500)
-// or opened from file:// protocol, fallback to localhost:5000/api.
-// In production unified deployment, use the same origin where the frontend is served.
-const API_BASE = 
-  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") && window.location.port !== "5000"
-    ? "http://localhost:5000/api"
-    : window.location.origin === "null"
-      ? "http://localhost:5000/api"
-      : `${window.location.origin}/api`;
+// ── Backend API Base URL ──────────────────────────────────────
+// Production backend is deployed on Render.
+// Local development still works — just change this one constant.
+const PROD_API = "https://expensiq.onrender.com/api";
+const DEV_API  = "http://localhost:5000/api";
+
+// Use production URL everywhere.
+// To switch back to local dev, change this to DEV_API.
+const API_BASE = PROD_API;
 
 // ── Page navigation ───────────────────────────────────────────
 // Using relative names works with Live Server, file://, and any web server
