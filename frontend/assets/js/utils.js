@@ -76,7 +76,7 @@ async function apiFetch(endpoint, options = {}) {
   } catch (err) {
     // Network error — backend unreachable
     showToast(
-      "Cannot connect to server. Make sure the backend is running on port 5000.",
+      "Cannot connect to server. Check your internet connection or try again shortly.",
       "error"
     );
     console.error("Network error:", err.message);
